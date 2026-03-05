@@ -1,0 +1,71 @@
+services:
+  ingoschindler:
+    image: nginx:1-alpine
+    expose:
+      - 80
+    volumes:
+      - ./ingoschindler.de/:/usr/share/nginx/html
+      - ./nginx-status.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - proxy
+      - nginx-internal
+
+  ingoschindler-exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    command: --nginx.scrape-uri=http://ingoschindler/stub_status
+    expose:
+      - 9113
+    networks:
+      - nginx-internal
+      - monitoring
+
+  hausschindler:
+    image: nginx:1-alpine
+    expose:
+      - 80
+    volumes:
+      - ./hausschindler.de/:/usr/share/nginx/html
+      - ./nginx-status.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - proxy
+      - nginx-internal
+
+  hausschindler-exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    command: --nginx.scrape-uri=http://hausschindler/stub_status
+    expose:
+      - 9113
+    networks:
+      - nginx-internal
+      - monitoring
+
+  sashriti-homepage:
+    image: nginx:1-alpine
+    expose:
+      - 80
+    volumes:
+      - ./sashriti.com/:/usr/share/nginx/html
+      - ./nginx-status.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - proxy
+      - nginx-internal
+
+  sashriti-homepage-exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    command: --nginx.scrape-uri=http://sashriti-homepage/stub_status
+    expose:
+      - 9113
+    networks:
+      - nginx-internal
+      - monitoring
+
+networks:
+  proxy:
+    external: true
+    name: schindler_net
+  monitoring:
+    external: true
+    name: sashriti_monitoring
+  nginx-internal:
+    driver: bridge
+
