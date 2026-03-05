@@ -127,6 +127,6 @@ networks:
     name: schindler_net
   monitoring:
     external: true
-    name: deploy_monitoring
+    name: sashriti_monitoring
   nginx-internal:
     driver: bridge
