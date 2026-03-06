@@ -71,10 +71,12 @@ services:
       --real-time-html
       --port=7890
       --addr=0.0.0.0
+      --geoip-database=/geoip/GeoLite2-City.mmdb
     volumes:
       - logs_ingoschindler:/var/log/nginx:ro
       - ./goaccess-ingoschindler.conf:/etc/goaccess/goaccess.conf:ro
       - report_ingoschindler:/srv/report
+      - ./geoip/GeoLite2-City.mmdb:/geoip/GeoLite2-City.mmdb:ro
     expose:
       - 7889
       - 7890
@@ -99,10 +101,12 @@ services:
       --real-time-html
       --port=7890
       --addr=0.0.0.0
+      --geoip-database=/geoip/GeoLite2-City.mmdb
     volumes:
       - logs_hausschindler:/var/log/nginx:ro
       - ./goaccess-hausschindler.conf:/etc/goaccess/goaccess.conf:ro
       - report_hausschindler:/srv/report
+      - ./geoip/GeoLite2-City.mmdb:/geoip/GeoLite2-City.mmdb:ro
     expose:
       - 7889
       - 7890
@@ -127,10 +131,12 @@ services:
       --real-time-html
       --port=7890
       --addr=0.0.0.0
+      --geoip-database=/geoip/GeoLite2-City.mmdb
     volumes:
       - logs_sashriti:/var/log/nginx:ro
       - ./goaccess-sashriti.conf:/etc/goaccess/goaccess.conf:ro
       - report_sashriti:/srv/report
+      - ./geoip/GeoLite2-City.mmdb:/geoip/GeoLite2-City.mmdb:ro
     expose:
       - 7889
       - 7890
