@@ -85,7 +85,7 @@ chmod +x update-geoip.sh
 - [ ] **Step 4: GeoIP-Datei herunterladen**
 
 ```bash
-bash update-geoip.sh
+cd /home/ingo/dev/proxy && bash update-geoip.sh
 ```
 
 Achtung: Der letzte Befehl (`docker compose restart ...`) schlägt fehl, weil die Container noch nicht existieren. Das ist erwartet. Die Datei muss vorhanden sein:
