@@ -10,6 +10,9 @@ services:
     networks:
       - proxy
       - nginx-internal
+    labels:
+      - "traefik.http.routers.mein-service.middlewares=log-marker"
+      - "traefik.http.middlewares.log-marker.headers.customrequestheaders.X-GoAccess-Group=home"
 
   hausschindler:
     image: nginx:1-alpine
@@ -22,6 +25,9 @@ services:
     networks:
       - proxy
       - nginx-internal
+    labels:
+      - "traefik.http.routers.mein-service.middlewares=log-marker"
+      - "traefik.http.middlewares.log-marker.headers.customrequestheaders.X-GoAccess-Group=home"
 
   sashriti-homepage:
     image: nginx:1-alpine
