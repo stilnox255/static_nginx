@@ -83,7 +83,7 @@ services:
       - "traefik.http.routers.bfof-admin.entrypoints=web,websecure"
       - "traefik.http.routers.bfof-admin.tls.certresolver=letsencrypt"
       - "traefik.http.routers.bfof-admin.middlewares=redirect-https@file"
-      - "traefik.http.routers.bfof-admin.priority=40"
+      - "traefik.http.routers.bfof-admin.priority=50"
       - "traefik.http.services.bfof-admin.loadbalancer.server.port=80"
 
 networks:
