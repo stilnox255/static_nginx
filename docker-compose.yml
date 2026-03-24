@@ -76,6 +76,13 @@ services:
       - ./nginx-spa.conf:/etc/nginx/conf.d/default.conf:ro
     networks:
       - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bfof-pwa.rule=Host(`app.blackforestonfire.de`) && PathPrefix(`/admin`)"
+      - "traefik.http.routers.bfof-pwa.entrypoints=web,websecure"
+      - "traefik.http.routers.bfof-pwa.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.bfof-pwa.middlewares=redirect-https@file"
+      - "traefik.http.services.bfof-pwa.loadbalancer.server.port=80"
 
 networks:
   proxy:
