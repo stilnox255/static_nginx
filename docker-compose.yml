@@ -82,7 +82,8 @@ services:
       - "traefik.http.routers.bfof-admin.rule=Host(`app.blackforestonfire.de`) && PathPrefix(`/admin`)"
       - "traefik.http.routers.bfof-admin.entrypoints=web,websecure"
       - "traefik.http.routers.bfof-admin.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.bfof-admin.middlewares=redirect-https@file"
+      - "traefik.http.routers.bfof-admin.middlewares=redirect-https@file,admin-strip"
+      - "traefik.http.middlewares.admin-strip.stripprefix.prefixes=/admin"
       - "traefik.http.routers.bfof-admin.priority=50"
       - "traefik.http.services.bfof-admin.loadbalancer.server.port=80"
 
