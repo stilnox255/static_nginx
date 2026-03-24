@@ -13,7 +13,7 @@ services:
       - "traefik.http.routers.home-ingoschindler.rule=Host(`ingoschindler.de`)"
       - "traefik.http.routers.home-ingoschindler.entrypoints=web,websecure"
       - "traefik.http.routers.home-ingoschindler.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.home-ingoschindler.middlewares=redirect-https"
+      - "traefik.http.routers.home-ingoschindler.middlewares=redirect-https@file"
       - "traefik.http.services.home-ingoschindler.loadbalancer.server.port=80"
 
   hausschindler:
@@ -30,7 +30,7 @@ services:
       - "traefik.http.routers.home-hausschindler.rule=Host(`hausschindler.de`)"
       - "traefik.http.routers.home-hausschindler.entrypoints=web,websecure"
       - "traefik.http.routers.home-hausschindler.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.home-hausschindler.middlewares=redirect-https"
+      - "traefik.http.routers.home-hausschindler.middlewares=redirect-https@file"
       - "traefik.http.services.home-hausschindler.loadbalancer.server.port=80"
 
   sashriti-homepage:
@@ -47,7 +47,7 @@ services:
       - "traefik.http.routers.sashriti-homepage.rule=Host(`www.sashriti.com`)"
       - "traefik.http.routers.sashriti-homepage.entrypoints=web,websecure"
       - "traefik.http.routers.sashriti-homepage.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.sashriti-homepage.middlewares=redirect-https"
+      - "traefik.http.routers.sashriti-homepage.middlewares=redirect-https@file"
       - "traefik.http.services.sashriti-homepage.loadbalancer.server.port=80"
 
   bfof-pwa:
@@ -64,7 +64,7 @@ services:
       - "traefik.http.routers.bfof-pwa.rule=Host(`app.blackforestonfire.de`)"
       - "traefik.http.routers.bfof-pwa.entrypoints=web,websecure"
       - "traefik.http.routers.bfof-pwa.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.bfof-pwa.middlewares=redirect-https"
+      - "traefik.http.routers.bfof-pwa.middlewares=redirect-https@file"
       - "traefik.http.services.bfof-pwa.loadbalancer.server.port=80"
 
   bfof-admin:
