@@ -141,7 +141,7 @@ ws-url wss://stats.ingoschindler.de:443/ws
 ws-url wss://stats.sashriti.com:443/ws
 ```
 
-Hinweis zum Log-Format: Traefik v3.6 gibt JSON-Felder alphabetisch sortiert aus. GoAccess parst GOJSON positionsbasiert (kein Key-Lookup), daher müssen alle Felder in der exakten Reihenfolge des tatsächlichen Outputs stehen. Unbenötigte Felder werden mit `%^` übersprungen. Der Timestamp (`StartUTC`) enthält Nanosekunden (`2026-03-24T12:04:30.159685949Z`); das Muster `%dT%t.%^Z` konsumiert die Nachkommastellen korrekt.
+Hinweis zum Log-Format: Traefik v3.6 gibt JSON-Felder alphabetisch sortiert aus. GoAccess parst GOJSON per Forward-Key-Scan: Es sucht jeden Schlüssel vorwärts im JSON-String ab der aktuellen Position (kein Rückwärts-Lookup). Daher müssen alle gelisteten Felder in der gleichen Reihenfolge wie im tatsächlichen Log-Output stehen. Unlisted fields between two listed fields are skipped automatically. Unbenötigte Felder werden mit `%^` übersprungen. Der Timestamp (`StartUTC`) enthält Nanosekunden (`2026-03-24T12:04:30.159685949Z`); das Muster `%dT%t.%^Z` konsumiert die Nachkommastellen korrekt.
 
 ### 4. `proxy/dynamic/ingoschindler.yml`
 
