@@ -79,12 +79,12 @@ services:
       - proxy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.bfof-pwa.rule=Host(`app.blackforestonfire.de`) && PathPrefix(`/admin`)"
-      - "traefik.http.routers.bfof-pwa.entrypoints=web,websecure"
-      - "traefik.http.routers.bfof-pwa.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.bfof-pwa.middlewares=redirect-https@file"
-      - "traefik.http.routers.bfof-pwa.priority=40"
-      - "traefik.http.services.bfof-pwa.loadbalancer.server.port=80"
+      - "traefik.http.routers.bfof-admin.rule=Host(`app.blackforestonfire.de`) && PathPrefix(`/admin`)"
+      - "traefik.http.routers.bfof-admin.entrypoints=web,websecure"
+      - "traefik.http.routers.bfof-admin.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.bfof-admin.middlewares=redirect-https@file"
+      - "traefik.http.routers.bfof-admin.priority=40"
+      - "traefik.http.services.bfof-admin.loadbalancer.server.port=80"
 
 networks:
   proxy:
