@@ -1,7 +1,7 @@
 # Design: Zentralisierte Web-Statistiken via Traefik Access Log
 
 **Datum:** 2026-03-24
-**Status:** Approved
+**Status:** Approved (nach Spec-Review korrigiert)
 **Betroffene Projekte:** `proxy/`, `static_nginx/`
 
 ---
@@ -126,14 +126,22 @@ report-sashriti:
 
 **`proxy/goaccess-home.conf`** und **`proxy/goaccess-sashriti.conf`** (gleiche Struktur, unterschiedliche `ws-url`):
 
+**`proxy/goaccess-home.conf`:**
 ```
 time-format %H:%M:%S
 date-format %Y-%m-%d
-log-format {"ClientHost":"%h","StartUTC":"%dT%tZ","RequestMethod":"%m","RequestPath":"%U","RequestProtocol":"%H","DownstreamStatus":%s,"DownstreamContentSize":%b,"RequestRefererHeader":"%R","UserAgent":"%u","RequestHost":"%v"}
+log-format {"ClientAddr":"%^","ClientHost":"%h","ClientPort":"%^","ClientUsername":"%^","DownstreamContentSize":%b,"DownstreamStatus":%s,"Duration":%^,"GzipRatio":%^,"OriginContentSize":%^,"OriginDuration":%^,"OriginStatus":%^,"Overhead":%^,"RequestAddr":"%^","RequestContentSize":%^,"RequestCount":%^,"RequestHost":"%v","RequestMethod":"%m","RequestPath":"%U","RequestPort":"%^","RequestProtocol":"%H","RequestScheme":"%^","RetryAttempts":%^,"StartLocal":"%^","StartUTC":"%dT%t.%^Z"
 port 7890
 real-time-html true
-ws-url wss://stats.ingoschindler.de:443/ws   # bzw. wss://stats.sashriti.com:443/ws
+ws-url wss://stats.ingoschindler.de:443/ws
 ```
+
+**`proxy/goaccess-sashriti.conf`:** identisch, nur `ws-url` abweichend:
+```
+ws-url wss://stats.sashriti.com:443/ws
+```
+
+Hinweis zum Log-Format: Traefik v3.6 gibt JSON-Felder alphabetisch sortiert aus. GoAccess parst GOJSON positionsbasiert (kein Key-Lookup), daher müssen alle Felder in der exakten Reihenfolge des tatsächlichen Outputs stehen. Unbenötigte Felder werden mit `%^` übersprungen. Der Timestamp (`StartUTC`) enthält Nanosekunden (`2026-03-24T12:04:30.159685949Z`); das Muster `%dT%t.%^Z` konsumiert die Nachkommastellen korrekt.
 
 ### 4. `proxy/dynamic/ingoschindler.yml`
 
@@ -206,17 +214,17 @@ Volumes `logs_ingoschindler`, `logs_hausschindler`, `logs_sashriti` bleiben – 
 
 ## Migrationsstrategie
 
-1. Traefik-Config updaten + neu starten → Log-Datei beginnt zu schreiben
-2. GeoIP-Datei nach `proxy/geoip/` kopieren (oder `update-geoip.sh` ausführen)
-3. Neue GoAccess/report-Container hochfahren
-4. Traefik-Routing (dynamic config) auf neue Container-Namen umstellen
-5. Alte GoAccess/report-Container in `static_nginx` stoppen und entfernen
+1. `proxy/geoip/` Verzeichnis anlegen (`.gitkeep` einchecken), `geoip/` ins `.gitignore` eintragen
+2. `update-geoip.sh` ausführen → GeoLite2-City.mmdb nach `proxy/geoip/` laden
+3. Traefik-Config updaten + Traefik neu starten → **kurzer Ausfall (~5s)**, Log-Datei beginnt zu schreiben
+4. Neue GoAccess/report-Container hochfahren (`docker compose up -d goaccess-home report-home goaccess-sashriti report-sashriti`)
+5. Traefik-Routing (dynamic config) auf neue Container-Namen umstellen – Traefik lädt dynamische Config automatisch neu, kein Neustart nötig
 6. Verfügbarkeit von `stats.ingoschindler.de` und `stats.sashriti.com` prüfen
+7. Alte GoAccess/report-Container in `static_nginx` stoppen und entfernen
 
 ---
 
 ## Offene Punkte
 
-- **Traefik JSON-Feldnamen v3:** `DownstreamStatus` und `DownstreamContentSize` sind die v3-Feldnamen (v2 hieß es `OriginStatus`/`OriginContentSize`). Beim ersten Start prüfen ob das Log-Format korrekt geparst wird.
-- **GoAccess und fehlendes GeoIP-File:** Falls `GeoLite2-City.mmdb` nicht existiert, startet GoAccess nicht. Das File muss vor `docker compose up` vorhanden sein.
+- **GoAccess und fehlendes GeoIP-File:** Falls `GeoLite2-City.mmdb` nicht vorhanden ist, startet GoAccess nicht. Reihenfolge in der Migration beachten: erst Datei laden, dann Container starten. Das `proxy/geoip/`-Verzeichnis muss existieren (`.gitkeep`).
 - **bfof-Statistiken:** Bewusst ausgeklammert. Eigener Ansatz folgt separat.
