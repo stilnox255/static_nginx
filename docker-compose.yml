@@ -9,10 +9,13 @@ services:
       - logs_ingoschindler:/var/log/nginx
     networks:
       - proxy
-      - nginx-internal
     labels:
-      - "traefik.http.routers.mein-service.middlewares=log-marker"
-      - "traefik.http.middlewares.log-marker.headers.customrequestheaders.X-GoAccess-Group=home"
+      - "traefik.enable=true"
+      - "traefik.http.routers.home-ingoschindler.rule=Host(`ingoschindler.de`)"
+      - "traefik.http.routers.home-ingoschindler.entrypoints=web,websecure"
+      - "traefik.http.routers.home-ingoschindler.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.home-ingoschindler.middlewares=redirect-https"
+      - "traefik.http.services.home-ingoschindler.loadbalancer.server.port=80"
 
   hausschindler:
     image: nginx:1-alpine
@@ -24,10 +27,13 @@ services:
       - logs_hausschindler:/var/log/nginx
     networks:
       - proxy
-      - nginx-internal
     labels:
-      - "traefik.http.routers.mein-service.middlewares=log-marker"
-      - "traefik.http.middlewares.log-marker.headers.customrequestheaders.X-GoAccess-Group=home"
+      - "traefik.enable=true"
+      - "traefik.http.routers.home-hausschindler.rule=Host(`hausschindler.de`)"
+      - "traefik.http.routers.home-hausschindler.entrypoints=web,websecure"
+      - "traefik.http.routers.home-hausschindler.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.home-hausschindler.middlewares=redirect-https"
+      - "traefik.http.services.home-hausschindler.loadbalancer.server.port=80"
 
   sashriti-homepage:
     image: nginx:1-alpine
@@ -39,7 +45,13 @@ services:
       - logs_sashriti:/var/log/nginx
     networks:
       - proxy
-      - nginx-internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sashriti-homepage.rule=Host(`www.sashriti.com`)"
+      - "traefik.http.routers.sashriti-homepage.entrypoints=web,websecure"
+      - "traefik.http.routers.sashriti-homepage.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.sashriti-homepage.middlewares=redirect-https"
+      - "traefik.http.services.sashriti-homepage.loadbalancer.server.port=80"
 
   bfof-pwa:
     image: nginx:1-alpine
@@ -51,7 +63,13 @@ services:
       - logs_bfof_pwa:/var/log/nginx
     networks:
       - proxy
-      - nginx-internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bfof-pwa.rule=Host(`app.blackforestonfire.de`)"
+      - "traefik.http.routers.bfof-pwa.entrypoints=web,websecure"
+      - "traefik.http.routers.bfof-pwa.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.bfof-pwa.middlewares=redirect-https"
+      - "traefik.http.services.bfof-pwa.loadbalancer.server.port=80"
 
   bfof-admin:
     image: nginx:1-alpine
@@ -63,141 +81,8 @@ services:
       - logs_bfof_admin:/var/log/nginx
     networks:
       - proxy
-      - nginx-internal
-
-  ingoschindler-exporter:
-    image: nginx/nginx-prometheus-exporter:latest
-    command: --nginx.scrape-uri=http://ingoschindler/stub_status
-    expose:
-      - 9113
-    networks:
-      - nginx-internal
-      - monitoring
-
-  hausschindler-exporter:
-    image: nginx/nginx-prometheus-exporter:latest
-    command: --nginx.scrape-uri=http://hausschindler/stub_status
-    expose:
-      - 9113
-    networks:
-      - nginx-internal
-      - monitoring
-
-  sashriti-homepage-exporter:
-    image: nginx/nginx-prometheus-exporter:latest
-    command: --nginx.scrape-uri=http://sashriti-homepage/stub_status
-    expose:
-      - 9113
-    networks:
-      - nginx-internal
-      - monitoring
-
-  goaccess-ingoschindler:
-    image: allinurl/goaccess:latest
-    command: >
-      /var/log/nginx/access.log
-      --config-file=/etc/goaccess/goaccess.conf
-      --output=/srv/report/index.html
-      --real-time-html
-      --port=7890
-      --addr=0.0.0.0
-      --geoip-database=/geoip/GeoLite2-City.mmdb
-    volumes:
-      - logs_ingoschindler:/var/log/nginx:ro
-      - ./goaccess-ingoschindler.conf:/etc/goaccess/goaccess.conf:ro
-      - report_ingoschindler:/srv/report
-      - ./geoip/GeoLite2-City.mmdb:/geoip/GeoLite2-City.mmdb:ro
-    expose:
-      - 7889
-      - 7890
-    networks:
-      - proxy
-
-  report-ingoschindler:
-    image: nginx:1-alpine
-    volumes:
-      - report_ingoschindler:/usr/share/nginx/html:ro
-    expose:
-      - 80
-    networks:
-      - proxy
-
-  goaccess-hausschindler:
-    image: allinurl/goaccess:latest
-    command: >
-      /var/log/nginx/access.log
-      --config-file=/etc/goaccess/goaccess.conf
-      --output=/srv/report/index.html
-      --real-time-html
-      --port=7890
-      --addr=0.0.0.0
-      --geoip-database=/geoip/GeoLite2-City.mmdb
-    volumes:
-      - logs_hausschindler:/var/log/nginx:ro
-      - ./goaccess-hausschindler.conf:/etc/goaccess/goaccess.conf:ro
-      - report_hausschindler:/srv/report
-      - ./geoip/GeoLite2-City.mmdb:/geoip/GeoLite2-City.mmdb:ro
-    expose:
-      - 7889
-      - 7890
-    networks:
-      - proxy
-
-  report-hausschindler:
-    image: nginx:1-alpine
-    volumes:
-      - report_hausschindler:/usr/share/nginx/html:ro
-    expose:
-      - 80
-    networks:
-      - proxy
-
-  goaccess-sashriti:
-    image: allinurl/goaccess:latest
-    command: >
-      /var/log/nginx/access.log
-      --config-file=/etc/goaccess/goaccess.conf
-      --output=/srv/report/index.html
-      --real-time-html
-      --port=7890
-      --addr=0.0.0.0
-      --geoip-database=/geoip/GeoLite2-City.mmdb
-    volumes:
-      - logs_sashriti:/var/log/nginx:ro
-      - ./goaccess-sashriti.conf:/etc/goaccess/goaccess.conf:ro
-      - report_sashriti:/srv/report
-      - ./geoip/GeoLite2-City.mmdb:/geoip/GeoLite2-City.mmdb:ro
-    expose:
-      - 7889
-      - 7890
-    networks:
-      - proxy
-
-  report-sashriti:
-    image: nginx:1-alpine
-    volumes:
-      - report_sashriti:/usr/share/nginx/html:ro
-    expose:
-      - 80
-    networks:
-      - proxy
-
-volumes:
-  logs_ingoschindler:
-  logs_hausschindler:
-  logs_sashriti:
-  logs_bfof_pwa:
-  logs_bfof_admin:
-  report_ingoschindler:
-  report_hausschindler:
-  report_sashriti:
 
 networks:
   proxy:
     external: true
     name: schindler_net
-  monitoring:
-    external: true
-    name: sashriti_monitoring
-  nginx-internal:
-    driver: bridge
